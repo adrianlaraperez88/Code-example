@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+
+
+        <!--Paleo-->
+        <record id="paleo" model="pos.category">
+            <field name="name">Pale</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/beverage-image.jpg"/>-->
+        </record>
+
+        <record id="paleo_extra" model="pos.category">
+            <field name="parent_id" ref="paleo"/>
+            <field name="name">Extra</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/water-image.jpg"/>-->
+        </record>
+
+        <record id="paleo_exclusion" model="pos.category">
+            <field name="parent_id" ref="paleo"/>
+            <field name="name">Exclusion</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/beers-image.jpg"/>-->
+        </record>
+
+        <!--Pescatarian-->
+        <record id="pescatarian" model="pos.category">
+            <field name="name">Pescatarian</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/beverage-image.jpg"/>-->
+        </record>
+
+        <record id="pescatarian_extra" model="pos.category">
+            <field name="parent_id" ref="pescatarian"/>
+            <field name="name">Extra</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/water-image.jpg"/>-->
+        </record>
+
+        <record id="pescatarian_exclusion" model="pos.category">
+            <field name="parent_id" ref="pescatarian"/>
+            <field name="name">Exclusion</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/beers-image.jpg"/>-->
+        </record>
+
+
+         <!--Lifestyle-->
+        <record id="lifestyle" model="pos.category">
+            <field name="name">Lifestyle</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/beverage-image.jpg"/>-->
+        </record>
+
+        <record id="lifestyle_extra" model="pos.category">
+            <field name="parent_id" ref="lifestyle"/>
+            <field name="name">Extra</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/water-image.jpg"/>-->
+        </record>
+
+        <record id="lifestyle_exclusion" model="pos.category">
+            <field name="parent_id" ref="lifestyle"/>
+            <field name="name">Exclusion</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/beers-image.jpg"/>-->
+        </record>
+
+
+               <!--Vegetarian-->
+        <record id="vegetarian" model="pos.category">
+            <field name="name">Vegetarian</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/beverage-image.jpg"/>-->
+        </record>
+
+        <record id="vegetarian_extra" model="pos.category">
+            <field name="parent_id" ref="vegetarian"/>
+            <field name="name">Extra</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/water-image.jpg"/>-->
+        </record>
+
+        <record id="vegetarian_exclusion" model="pos.category">
+            <field name="parent_id" ref="vegetarian"/>
+            <field name="name">Exclusion</field>
+            <!--<field name="image" type="base64" file="point_of_sale/static/img/beers-image.jpg"/>-->
+        </record>
+
+    </data>
+</openerp>

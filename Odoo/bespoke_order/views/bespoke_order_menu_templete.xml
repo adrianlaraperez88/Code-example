@@ -1,0 +1,15 @@
+<openerp>
+    <data>
+        <template id="top_header" inherit_id="website.layout" name="top_header">
+            <xpath expr="//header//ul[@id='top_menu']/li" position="before">
+                <li id="bespoke_order">
+                    <a class="page-scroll" href="/order">Order</a>
+                </li>
+
+            </xpath>
+        </template>
+
+
+
+    </data>
+</openerp>

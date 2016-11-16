@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <template id="assets_frontend_css" name="bespoke_order_css_inherit" inherit_id="website.assets_frontend">
+            <xpath expr="." position="inside">
+                <!-- <link rel="stylesheet" href="/bespoke_order/static/src/css/boostrap.min.css"/>-->
+                <link rel="stylesheet" href="/bespoke_order/static/src/css/wizard_order.css"/>
+                <link rel="stylesheet" href="/bespoke_order/static/src/css/datepicker.css"/>
+                <link rel="stylesheet" href="/bespoke_order/static/src/css/pickList.css"/>
+                <link rel="stylesheet" href="/bespoke_order/static/src/css/radios-to-slider.min.css"/>
+            </xpath>
+        </template>
+
+
+        <template id="wizard_order" name="Order: Wizard">
+            <div class="form-progress">
+                <div class="form-progress-wrap clearfix">
+                    <a id="wizard-a-step1" data-wizard-a="step-wizard"
+                       class="progress-btn progress1 active" style="outline: none;">
+                        Step 1
+                    </a>
+                    <a id="wizard-a-step2" data-wizard-a="step-wizard"
+                       class="progress-btn progress2 ">Step 2
+                    </a>
+                    <a id="wizard-a-step3" data-wizard-a="step-wizard"
+                       class="progress-btn progress3 ">Step 3
+                    </a>
+                    <a id="wizard-a-step4" data-wizard-a="step-wizard"
+                       class="progress-btn progress4 ">Step 4
+                    </a>
+                </div>
+            </div>
+
+        </template>
+
+        <template id="order">
+            <t t-call="website.layout">
+                <div class="oe_structure"/>
+                <div class="container-fluid total" id="mainframe">
+                    <form action="/bespoke_order/postcode_email_validate" method="post" id="postcode_email_form"
+                          enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-3 contained-text col-lg-offset-2 col-lg-8"
+                                 id="start-order">
+                                <h2 class="strap">Give us some basic information</h2>
+                                <div class="padded col-xl-7 col-xl-offset-0 col-lg-offset-0 col-lg-7 col-md-offset-3 col-sm-offset-3 col-md-6 col-sm-6 col-xs-10 col-xs-offset-1">
+                                    <input placeholder="EMAIL" type="text" class="form_field" for="email_from"
+                                           id="email_from" name="email_from"
+                                           t-att-value="request.params.get('email_from', '')" required=""/>
+                                </div>
+                                <div class="padded col-xl-5 col-xl-offset-0 col-lg-offset-0 col-lg-5 col-md-offset-3 col-sm-offset-3  col-md-6 col-sm-6 col-xs-10 col-xs-offset-1">
+                                    <input placeholder="POSTCODE" type="text" class="form_field" id="postcode"
+                                           name="postcode" for="postcode"
+                                           t-att-value="request.params.get('postcode', '')" required=""/>
+                                </div>
+                                <div class="col-xl-6 col-xl-offset-3 col-lg-offset-3 col-lg-6 col-md-offset-3 col-sm-offset-3  col-md-6 col-sm-6 col-xs-6 col-xs-offset-3">
+                                    <input name="button" type="button" class="cta_button" id="send_email_postcode"
+                                           value="SEND"/>
+                                </div>
+                                <div class="alert alert-danger hide" role="alert" id="error_msg_pos_email"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </t>
+        </template>
+
+        <template id="bespoke_order_cart_lines" inherit_id="website_sale.cart_lines">
+            <xpath expr="//thead" position="replace">
+                <tr>
+                    <th width="100">Product</th>
+                    <th></th>
+                    <th id="thead_th_is_product_diet"></th>
+                    <th width="130" t-att-style="'display:none'" class="text-center"></th>
+                    <th width="130" t-att-style="'display:none'" class="text-center"></th>
+                    <th width="100" class="text-center">Price</th>
+                </tr>
+
+            </xpath>
+
+            <xpath expr="//td[@id='td-qty']" position="before">
+                <td id='td-qty-bespoke' t-if="line.is_product_diet">
+
+                    <strong>
+                        <t t-esc="line.msg_card"/>
+                    </strong>
+                </td>
+                <td id='td-qty-bespoke' t-if="not line.is_product_diet">
+
+                    <strong></strong>
+                </td>
+            </xpath>
+
+            <xpath expr="//td[@id='td-price']" position="after">
+                <td id='td-price-bespoke'>
+                    <span t-field="line.price_total" style="white-space: nowrap;" t-field-options='{
+                     "widget": "monetary",
+                     "display_currency": "website.currency_id"
+                 }'/>
+                </td>
+            </xpath>
+            <xpath expr="//td[@id='td-price']" position="attributes">
+                <attribute name="t-att-style">'display: none'</attribute>
+            </xpath>
+
+            <xpath expr="//td[@id='td-qty']" position="attributes">
+                <attribute name="t-att-style">'display: none'</attribute>
+            </xpath>
+        </template>
+
+        <template id="checkout_terms_conditions" inherit_id="website_sale.checkout">
+
+            <xpath expr="//div[@id='wrap']/div/form//div[@class='col-md-8 oe_cart']/div[@class='clearfix']"
+                   position="before">
+                <div class="row">
+                    <p class="termsconditions">
+                        <input type="checkbox" id="terms" value=""/>
+                        <span>I have read and agree with the <a href="/Terms" target="_blank">Privacy Policy and Terms
+                            Conditions
+                        </a> of the site.
+                        </span>
+                    </p>
+                </div>
+            </xpath>
+
+            <xpath expr="//div[@id='wrap']/div/form/div/div[@class='col-md-8 oe_cart']//a[@class='btn btn-default btn-primary pull-right mb32 a-submit']"
+                   position="attributes">
+                <attribute name="id">gotopayment</attribute>
+            </xpath>
+            <xpath expr="//a[@id='gotopayment']" position="attributes">
+                <attribute name="class">btn btn-default btn-primary pull-right mb32 a-submit disabled</attribute>
+                <attribute name="id">gotopayment</attribute>
+            </xpath>
+
+        </template>
+
+        <template id="order_templete">
+            <t t-call="website.layout">
+                <div class="oe_structure"/>
+                <!--<div class="container wrap-shadow">-->
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="alert alert-danger hide" role="alert" id="error_msg"></div>
+                        <div id="container_steps" class="col-xs-12 col-sm-12 col-md-9 col-lg-9 ">
+
+                            <input type="hidden" id="csrf_token" name="csrf_token"
+                                   t-att-value="request.csrf_token(None)"/>
+                            <div class="slide row-fluid " id="step1">
+                                <div class="gender" style="margin-top: 50px; margin-bottom: 15px;">
+                                    <div class="row">
+                                        <h2 class="strap">GENDER</h2>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4"
+                                             style="padding-left: 0; padding-right:5px; margin-top: 2px;">
+
+                                            <a class="buttonAction btn-lg text-center" style="width:100%;"
+                                               data-selection-type="single"
+                                               id="btnclick_single" data-factor-name="sex"
+                                               data-factor-value="male" href="#" role="button">
+                                                <div class="text-btn">Male</div>
+                                            </a>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4  "
+                                             style="padding-left: 0; padding-right: 5px; margin-top: 2px;">
+                                            <a class="buttonAction btn-lg text-center" style="width: 100%;"
+                                               data-selection-type="single"
+                                               id="btnclick_single" data-factor-name="sex"
+                                               data-factor-value="female" href="#" role="button">
+                                                <div class="text-btn">Female</div>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <h2 class="strap">Select your goal</h2>
+                                </div>
+                                <div class="row m-b-1" style="margin-bottom: 15px;">
+                                    <t t-foreach="type_plan" t-as="plan">
+
+
+                                        <div class="col-xs-12 col-md-4 "
+                                             style="padding-left: 0; padding-right:5px;margin-top: 2px;">
+
+                                            <a class="buttonPlan btn-lg" style="width: 100%;"
+                                               data-selection-type="single"
+                                               id="btnclick_single_tpl" data-factor-name="goal_plan"
+                                               t-att="{'data-factor-value': plan.id,'data-invoice-title':plan.name}"
+                                               href="#"
+                                               role="button">
+                                                <p class="text-btn">
+                                                    <t t-esc="plan.name"/>
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="row">
+                                    <h2 class="strap">Select your Meal Type</h2>
+                                </div>
+
+                                <div class="row">
+                                    <t t-foreach="category" t-as="cat">
+
+                                        <div class="col-xs-6 col-md-3 button-test text-center">
+
+                                            <a class="buttonMealType btn-lg"
+                                               t-att="{'data-factor-value': cat.name,'data-invoice-title':cat.name}"
+                                               data-selection-type="single"
+                                               id="btnclick_single_cat" data-factor-name="meal_type"
+                                               href="#" role="button">
+                                                <img t-att-src="'data:image/png;base64,%s' % cat.image"/>
+                                            </a>
+
+                                        </div>
+
+                                        <div t-if="len(category) == 0" class="col-xs-12">
+                                            <a class="buttonPlan col-xs-12 col-md-6" href="#" role="button">
+                                                <p class="text-btn">Sorry, not available now.</p>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </div>
+
+                            </div>
+                            <!--About You -->
+                            <div class="slide row-fluid hide" id="step2">
+                                <div class="row bordered stats" style="margin-top: 70px">
+                                    <h2 class="strap">About you</h2>
+
+                                    <div class="col-md-4">
+                                        <label for="weight">Weight (Kg)</label>
+                                        <input type="text" class="form-control form-control-extended number"
+                                               data-rule-required="true" id="weight"
+                                               placeholder="Weight (Kilos)"/>
+                                        <div class="row">
+                                            <div class="col-xs-7 col-sm-7">
+                                                <label for="weight">Stones</label>
+                                                <input id="stones" type="text"
+                                                       class="form-control form-control-extended stones"
+                                                       placeholder="Stones"/>
+                                            </div>
+                                            <div class="col-xs-5 col-sm-5">
+                                                <label for="weight">Pounds</label>
+                                                <input id="pounds" type="text"
+                                                       class="form-control form-control-extended "
+                                                       placeholder="Pounds"/>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="height">Height (Cm)</label>
+                                        <input type="text" class="form-control form-control-extended number"
+                                               data-rule-required="true" id="height"
+                                               placeholder="Height (Centimeters)"/>
+                                        <div class="row">
+                                            <div class="col-xs-7 col-sm-7">
+                                                <label for="weight">Feet</label>
+                                                <input id="feets" type="text"
+                                                       class="form-control form-control-extended "
+                                                       placeholder="Feet"/>
+                                            </div>
+                                            <div class="col-xs-5 col-sm-5">
+                                                <label for="weight">Inches</label>
+                                                <input id="inches" type="text"
+                                                       class="form-control form-control-extended "
+                                                       placeholder="Inches"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="pull-left" for="db">Age</label>
+                                            <input type="text" data-rule-required="true"
+                                                   class="form-control form-control-extended  number" id="db"
+                                                   placeholder="Age"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row bordered activity">
+                                    <h2 class="strap">Activity</h2>
+                                    <div class="col-md-4">
+                                        <div id="al" class="form-group ">
+                                            <label class="pull-left" for="al">ACTIVITY LEVEL DURING THE DAY
+                                            </label>
+                                            <select class="form-control form-control-extended " id="actLevel"
+                                                    data-rule-required="true">
+                                                <option value="-1">Select</option>
+                                                <option value="1.2">Little or no exercise</option>
+                                                <option value="1.38">Exercise 1-3 days/wk</option>
+                                                <option value="1.55">Exercise 3-5 days/wk</option>
+                                                <option value="1.73">Exercise 6-7 days/wk</option>
+                                                <option value="1.9">Hard daily exercise/sports</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="pull-left" for="bfp">Body Fat % (optional)</label>
+                                            <input type="text" class="form-control form-control-extended number"
+                                                   id="bfp" placeholder="Body fat Percentage (%)"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="checkbox-inline"><input type="checkbox" id="ikmacros"
+                                                                                  value="ikmacros"/>I want to enter
+                                                my own
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row bordered macros">
+                                    <h2 class="strap">Specify your Daily Macros</h2>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="pull-left">Protein (grams)</label>
+                                            <input type="text" id="protein" data-rule-required="true"
+                                                   class="form-control form-control-extended number protein"
+                                                   placeholder="Protein (grams)"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="pull-left">Fat (grams)</label>
+                                            <input type="text" id="fat" data-rule-required="true"
+                                                   class="form-control form-control-extended number fat"
+                                                   placeholder="Fat (grams)"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="pull-left">Carbs (grams)</label>
+                                            <input type="text" id="carbs" data-rule-required="true"
+                                                   class="form-control form-control-extended number carbs"
+                                                   placeholder="Carbs (grams)"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="pull-left"></label>
+                                            <input type="text" id="totalMacros" t-att="{'disabled': disabled}"
+                                                   class="form-control  form-control-extended total"
+                                                   data-rule-required="true" placeholder="Total"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="slide row-fluid hide" id="step3">
+                                <div class="row mpd">
+                                    <h3 class="strap">How many meals per day</h3>
+
+                                    <div id="day_meals" class="col-xs-12 col-sm-6 col-md-3 text-center"></div>
+                                </div>
+                                <div class="row">
+                                    <h2 class="strap">Pick up your extras</h2>
+                                    <div class="row-fluid text-center containerExtras" id="extras">
+
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <h2 class="strap">Select your exclusions</h2>
+                                    <div class="row-fluid text-center containerExclusions" id="exclusions">
+                                    </div>
+                                </div>
+                                <div class="notificationChargesExclusions"></div>
+
+                                <div class="row">
+                                    <!--<div class="row" t-if="len(contracts) > 0">-->
+                                    <h2 class="strap">Days contract (reflects the price)</h2>
+
+                                    <div style="col-xs-12" id="contracts"></div>
+
+                                </div>
+                            </div>
+
+                            <!--Extras & Exclusions -->
+                            <div class="slide row-fluid hide" id="step4">
+                                <div class="row">
+
+                                    <div class="loader-container" id="summaryLoader">
+                                        <div class="loader">Loading...</div>
+                                        <h4 style="margin-top: 10px;">Preparing your order...</h4>
+                                    </div>
+                                    <div class="col-md-12 summaryOrder ">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h5 class="text-center">
+                                                    <strong>Order summary</strong>
+                                                </h5>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-condensed table-hover">
+                                                        <caption class="invoice-caption">Selections</caption>
+                                                        <thead>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Your Goal</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Meal Type</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Contract</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Meal per Day</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Price per Day</strong>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <strong>Total</strong>
+                                                                </td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td id="goal_plan">example plan</td>
+                                                                <td class="text-center" id="meal_type">Meal Type
+                                                                </td>
+                                                                <td class="text-center" id="contract">Contract
+                                                                </td>
+                                                                <td class="text-center" id="meal_per_day">1</td>
+                                                                <td class="text-center" id="price_per_day">1</td>
+                                                                <td class="text-right" id="total_pay">1
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="table-responsive">
+                                                    <table class="table table-condensed your-macros table-hover">
+                                                        <caption class="invoice-caption">Your Macros</caption>
+                                                        <thead>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Goal Calories</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Protein</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Fats</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Carbs</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Tdee</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>BMR</strong>
+                                                                </td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="table-responsive">
+                                                    <table class="table table-condensed extra-products table-hover">
+                                                        <caption class="invoice-caption">Extras</caption>
+                                                        <thead>
+                                                            <tr>
+                                                                <td class="text-left">
+                                                                    <strong>Item</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Quantity</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Meals/Day</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Meals/Week</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Price</strong>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <strong>Total</strong>
+                                                                </td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="table-responsive">
+                                                    <table class="table table-condensed exclusions-products table-hover">
+                                                        <caption
+                                                                style="font-weight: 600;color: #f39631;padding-bottom: 10px;"
+                                                                class="invoice-caption">Exclusions
+                                                        </caption>
+                                                        <thead>
+                                                            <tr>
+                                                                <td class="text-left">
+                                                                    <strong>Item</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Quantity</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Meals/Day</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Meals/Week</strong>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <strong>Charge</strong>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <strong>Total</strong>
+                                                                </td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="row">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--Bar button-->
+                                <div class="barButton">
+                                    <!--<a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"-->
+                                    <!--onclick="toShowBack(jQuery(this));" role="button">Back-->
+                                    <!--</a>-->
+                                    <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                       id="printorder" role="button">
+                                        <i class="fa  fa-print"></i>
+                                        Print
+                                    </a>
+                                    <a class="hvr-underline-from-left hvr-box-shadow-outset pull-right text-btn"
+                                       id="addtocart" data-factor-name="checkout"
+                                       data-factor-value="checkout" data-resume-name="Checkout" role="button">
+                                        Add To
+                                        Cart
+                                    </a>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <!--Summary-->
+                        <div class="col-md-3 col-lg-3" style="margin-top: 50px;">
+                            <div class="summary row hidden-sm hidden-xs">
+                                <div class="row">
+                                    <h2 class="strap text-center" style="text-decoration:underline; ">YOUR INFORMATION
+                                    </h2>
+                                    <div class="row-fluid containerSummary ">
+                                        <!--<a class="btnSummary"   href="#" role="button" >
+                                            <p class="text-btn"> Loose some weight</p>
+                                        </a>-->
+                                        <div class="toshowSlide" id="goal" data-slide="step1">
+                                            <p class="label">Goal</p>
+                                            <p class="value">..</p>
+                                        </div>
+                                        <div class="toshowSlide" id="calories" data-slide="step2">
+                                            <p class="label">Calories</p>
+                                            <p class="value">..</p>
+                                        </div>
+                                        <div class="toshowSlide" id="macros" data-slide="step2">
+                                            <p class="label">Macros</p>
+                                            <p class="value">
+                                                <span class="first_header"></span>
+                                                <span class="first"></span>
+                                                <span class="second_header"></span>
+                                                <span class="second"></span>
+                                                <span class="third_header"></span>
+                                                <span class="third"></span>
+
+                                            </p>
+                                        </div>
+                                        <div class="toshowSlide" id="mealtype" data-slide="step1">
+                                            <p class="label">Meal Type</p>
+                                            <p class="value">..</p>
+                                        </div>
+                                        <div class="toshowSlide" id="exclusions" data-slide="step3">
+                                            <p class="label">Exclusions/Allergies</p>
+                                            <p class="value">..</p>
+                                        </div>
+                                        <div class="toshowSlide" id="numberofmeals" data-slide="step3">
+                                            <p class="label">Meal Number Per Day</p>
+                                            <p class="value">..</p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                            <p>
+                                <a href="mailto:hello@bespokefitnessfuel.com">hello@bespokefitnessfuel.com</a>
+                            </p>
+                            <div id='next_btn' class="col-lg-12">
+                                <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                   id="toShowNext" role="button">Next
+                                </a>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+                <t t-call="bespoke_order.wizard_order"/>
+            </t>
+        </template>
+
+        <template id="ecommerce_confirmation_bespoke" inherit_id="website_sale.confirmation">
+            <xpath expr="//div[@id='wrap']//div[@class='row']//div[@class='oe_cart']/table[1]/tbody/tr[2]"
+                   position="replace">
+
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+
+                    <td>
+                        <strong>Exclusions:</strong>
+
+                    </td>
+                    <td class="text-right">
+                        <strong t-field="order.pay_exclusions"
+                                t-field-options='{"widget": "monetary", "display_currency": "order.pricelist_id.currency_id"}'/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+
+                    <td class="text-right">
+                        <strong>-Discount:</strong>
+                    </td>
+                    <td class="text-right">
+                        <strong t-field="order.discount_amt"
+                                t-field-options='{"widget": "monetary", "display_currency": "order.pricelist_id.currency_id"}'/>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+
+                    <td>
+                        <strong>Total:</strong>
+                    </td>
+                    <td class="text-right">
+                        <strong t-field="order.amount_total"
+                                t-field-options='{"widget": "monetary", "display_currency": "order.pricelist_id.currency_id"}'/>
+                    </td>
+                </tr>
+            </xpath>
+
+        </template>
+
+        <template id="ecommerce_total_bespoke_pay_exclusions" inherit_id="website_sale.total">
+            <xpath expr="//div[@id='cart_total']/div[@id='order_total_taxes']" position="after">
+
+
+                <div class="row" id="pay_contract_bespoke">
+                    <span class="col-xs-6 text-right text-muted"
+                          title="Discount for type contract">Contract:
+                    </span>
+                    <span class="col-xs-6 text-left text-muted">
+                        <span t-field="website_sale_order.pay_contract_bespoke" style="white-space: nowrap;"
+                              t-field-options='{
+                          "widget": "monetary",
+                          "from_currency": "website_sale_order.pricelist_id.currency_id",
+                          "display_currency": "website.currency_id"
+                      }'/>
+                    </span>
+                </div>
+
+                <div class="row" id="order_pay_exclusions">
+                    <span class="col-xs-6 text-right text-muted"
+                          title="Pay for exclusions may be updated after providing shipping address">Exclusions:
+                    </span>
+                    <span class="col-xs-6 text-left text-muted">
+                        <span t-field="website_sale_order.pay_exclusions" style="white-space: nowrap;" t-field-options='{
+                          "widget": "monetary",
+                          "from_currency": "website_sale_order.pricelist_id.currency_id",
+                          "display_currency": "website.currency_id"
+                      }'/>
+                    </span>
+                </div>
+
+                <div class="row" id="order_discount_contract">
+                    <span class="col-xs-6 text-right text-muted"
+                          title="Discount for type contract">-Discount:
+                    </span>
+                    <span class="col-xs-6 text-left text-muted">
+                        <span t-field="website_sale_order.discount_amt" style="white-space: nowrap;" t-field-options='{
+                          "widget": "monetary",
+                          "from_currency": "website_sale_order.pricelist_id.currency_id",
+                          "display_currency": "website.currency_id"
+                      }'/>
+                    </span>
+                </div>
+
+            </xpath>
+        </template>
+
+        <template id="info_contract">
+            <div class="row">
+                <div class="col-md-8 col-sm-9 oe_cart">
+                    <table class="table table-striped table-condensed js_cart_lines" id="cart_products"
+                           t-if="bki and bki.sale_order_id">
+                        <thead>
+                            <tr>
+                                <th width="100" class="text-center">Contract</th>
+                                <th width="130" class="text-center">Discount</th>
+                                <th width="100" class="text-center">Meals per Day</th>
+                                <th width="100" class="text-center">Price per day</th>
+                                <th width="100" class="text-center">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td align="center">
+                                    <span t-field="bki.bc_id"/>
+                                </td>
+                                <td align="center">
+                                    <span t-field="bki.discount_amount" t-field-options='{
+                    "widget": "monetary",
+                    "from_currency": "bki.sale_order_id.currency_id",
+                    "display_currency": "website.currency_id"
+                    }'/>
+                                </td>
+
+                                <td align="center">
+                                    <span t-field="bki.meal_number_id"/>
+                                </td>
+
+
+                                <td align="center">
+                                    <span t-field="bki.price_meal_day" t-field-options='{
+                    "widget": "monetary",
+                    "from_currency": "bki.sale_order_id.currency_id",
+                    "display_currency": "website.currency_id"
+                    }'/>
+                                </td>
+
+
+                                <td align="center">
+                                    <span t-field="bki.pay_per_contract" t-field-options='{
+                    "widget": "monetary",
+                    "from_currency": "bki.sale_order_id.currency_id",
+                    "display_currency": "website.currency_id"
+                    }'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </template>
+
+        <template id="ecommerce_cart_bespoke" inherit_id="website_sale.cart">
+
+
+            <xpath expr="//div[@id='wrap']/div[@class='container oe_website_sale']/div[@class='row']/div[@id='right_column']"
+                   position="inside">
+                <a t-if="website_sale_order and website_sale_order.website_order_line"
+                   class="btn btn-primary pull-banner mb32" href="/order">
+                    <span class="hidden-xs">Edit Order</span>
+                </a>
+            </xpath>
+
+            <xpath expr="//div[@id='wrap']/div[@class='container oe_website_sale']/div[@class='row']" position="before">
+                <t t-call="bespoke_order.info_contract"/>
+            </xpath>
+        </template>
+
+
+        <template id="assets_frontend_js" inherit_id="website.assets_frontend" name="bespoke_order_js_inherit">
+            <!--<xpath expr="script[last()]" position="after">-->
+            <xpath expr="script[last()]" position="after">
+                <!--<script type="text/javascript" src="/rebyc_strategies_theme/static/src/js/classie.js"></script>-->
+                <!--<script type="text/javascript" src="/rebyc_strategies_theme/static/src/js/main.js"></script>-->
+                <script type="text/javascript"
+                        src="/bespoke_order/static/src/js/jquery.radios-to-slider.min.js"></script>
+                <!--<script type="text/javascript" src="/bespoke_order/static/src/js/bootstrap-datepicker.js"></script>-->
+                <script type="text/javascript" src="/bespoke_order/static/src/js/pickList.js"></script>
+                <script type="text/javascript" src="/bespoke_order/static/src/js/printThis.js"></script>
+                <script type="text/javascript" src="/bespoke_order/static/src/js/bespoke_order.js"></script>
+            </xpath>
+        </template>
+
+
+    </data>
+</openerp>

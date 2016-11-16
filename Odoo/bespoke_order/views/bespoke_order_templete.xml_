@@ -1,0 +1,726 @@
+<openerp>
+    <data>
+
+
+        <template id="order_templete">
+            <t t-call="website.layout">
+                <div class="oe_structure">
+                    <div class="container wrap-shadow">
+                        <script type="text/javascript">
+                            odoo.define('web.csrf', function (require) {
+                            var token = "<t t-esc="request.csrf_token(None)"/>";
+                            require('web.core').csrf_token = token;
+                            require('qweb').default_dict.csrf_token = token;
+                            });
+                        </script>
+                        <div class="row-fluid">
+                            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 ">
+
+                                <input type="hidden" id="csrf_token" name="csrf_token"
+                                       t-att-value="request.csrf_token(None)"/>
+
+                                <!--Goal Plans-->
+                                <div class="slide row-fluid " id="step1">
+                                    <div class="row">
+                                        <h2 class="text-header">Select your goal</h2>
+                                    </div>
+                                    <t t-foreach="type_plan" t-as="plan">
+
+                                        <div class="row-fluid ">
+                                            <a class="buttonPlan large" data-selection-type="single"
+                                               onclick="btnClick(jQuery(this));" data-factor-name="goal_plan"
+                                               t-att="{'data-factor-value': plan.id,'data-invoice-title':plan.name}"
+                                               href="#"
+                                               role="button">
+                                                <p class="text-btn">
+                                                    <t t-esc="plan.name"/>
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </div>
+
+                                <!--Meal Types-->
+                                <div class="slide row-fluid hide" id="step2">
+                                    <div class="row">
+                                        <h2 class="text-header">Select your Meal Type</h2>
+                                    </div>
+
+                                    <t t-foreach="category" t-as="cat">
+
+                                        <div t-if="category[len(category)-1] == cat and len(category)%2 != 0"
+                                             class="col-xs-12 ">
+                                            <a class="buttonPlan col-xs-12 col-md-6"
+                                               t-att="{'data-factor-value': cat.name,'data-invoice-title':cat.name}"
+                                               data-selection-type="single"
+                                               onclick="btnClick(jQuery(this));" data-factor-name="meal_type"
+                                               href="#" role="button">
+                                                <p class="text-btn">
+                                                    <t t-esc="cat.name"/>
+                                                </p>
+                                            </a>
+                                        </div>
+
+                                        <div t-if="category[len(category)-1] != cat"
+                                             class="col-xs-12 col-md-6 ">
+                                            <a class="buttonPlan col-xs-12 col-md-6"
+                                               t-att="{'data-factor-value': cat.name,'data-invoice-title':cat.name}"
+                                               data-selection-type="single"
+                                               onclick="btnClick(jQuery(this));" data-factor-name="meal_type"
+                                               href="#" role="button">
+                                                <p class="text-btn">
+                                                    <t t-esc="cat.name"/>
+                                                </p>
+                                            </a>
+                                        </div>
+                                        <div t-if="len(category) == 0" class="col-xs-12">
+                                            <a class="buttonPlan col-xs-12 col-md-6" href="#" role="button">
+                                                <p class="text-btn">Sorry, not available now.</p>
+                                            </a>
+                                        </div>
+                                    </t>
+                                    <div class="barButton">
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="toShowBack(jQuery(this));" role="button">Back
+                                        </a>
+                                        <div class="pull-right hide" id="loader">
+                                            <div class="loader pull-left">Loading...</div>
+                                            <b style="margin-top: 10px;" class="pull-right">Calculating your
+                                                extras and exclusions...
+                                            </b>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--Juice Cleanse-->
+                                <div class="slide row-fluid hide" id="step3">
+                                    <div class="row">
+                                        <h2 class="text-header">Juice Cleanse</h2>
+                                    </div>
+
+                                    <div class="col-xs-12 col-md-6 ">
+                                        <a class="buttonPlan " data-selection-type="single"
+                                           onclick="btnClick(jQuery(this));" data-factor-name="juice_cleanse"
+                                           data-factor-value="true"
+                                           data-invoice-title="Start my plan with a Juice Clenase" href="#"
+                                           role="button">
+                                            <p class="text-btn">Start my plan with a Juice Clenase</p>
+                                        </a>
+                                    </div>
+                                    <div class="col-xs-12 col-md-6">
+                                        <a class="buttonPlan " data-selection-type="single"
+                                           onclick="btnClick(jQuery(this));" data-factor-name="juice_cleanse"
+                                           data-factor-value="false" data-invoice-title="No Juice Cleanse for now"
+                                           href="#" role="button">
+                                            <p class="text-btn">No Juice Cleanse for now</p>
+                                        </a>
+                                    </div>
+
+                                    <!--Bar button-->
+                                    <div class="barButton">
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="toShowBack(jQuery(this));" role="button">Back
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!--Post Code Verification-->
+                                <div class="slide row-fluid hide" id="step4">
+                                    <div class="row">
+                                        <h2 class="text-header">Check your post code</h2>
+                                    </div>
+
+                                    <div class="col-xs-12 col-md-6 ">
+                                        <input type="text" name="postcode" class="postcode"
+                                               placeholder="Post Code"/>
+                                    </div>
+                                    <div class="col-xs-12 col-md-6">
+                                        <a class="buttonPlan " data-selection-type="single"
+                                           data-factor-name="post_code"
+                                           data-factor-value="" data-invoice-title=""
+                                           onclick="btnClick(jQuery(this));"
+                                           href="#" role="button">
+                                            <p class="text-btn">
+                                                <i class="fa fa-check"></i>
+                                                Check Now
+                                            </p>
+                                        </a>
+                                    </div>
+
+                                    <!--Bar button-->
+                                    <div class="barButton">
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="toShowBack(jQuery(this));" role="button">Back
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!--Sex-->
+                                <div class="slide row-fluid hide" id="step5">
+                                    <div class="row ">
+                                        <h2 class="text-header">Please, provide your sex</h2>
+                                    </div>
+                                    <div class="row-fluid ">
+                                        <a class="buttonAction" data-selection-type="single"
+                                           onclick="btnClick(jQuery(this));" data-factor-name="sex"
+                                           data-factor-value="male" href="#" role="button">
+                                            <p class="text-btn">Maled</p>
+                                        </a>
+                                        <a class="buttonAction" data-selection-type="single"
+                                           onclick="btnClick(jQuery(this));" data-factor-name="sex"
+                                           data-factor-value="female" href="#" role="button">
+                                            <p class="text-btn">Femaleo</p>
+                                        </a>
+                                    </div>
+                                    <!--Bar button-->
+                                    <div class="barButton">
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="toShowBack(jQuery(this));" role="button">Back
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!--About You -->
+                                <div class="slide row-fluid hide" id="step6">
+                                    <div class="row bordered stats">
+                                        <h2 class="text-header">About you</h2>
+
+                                        <div class="col-md-4">
+                                            <label for="weight">Weight (Kg)</label>
+                                            <input type="text" class="form-control form-control-extended number"
+                                                   data-rule-required="true" id="weight"
+                                                   placeholder="Weight (Kilos)"/>
+                                            <div class="row">
+                                                <div class="col-xs-7 col-sm-7">
+                                                    <label for="weight">Stones</label>
+                                                    <input id="stones" type="text"
+                                                           class="form-control form-control-extended stones"
+                                                           placeholder="Stones"/>
+                                                </div>
+                                                <div class="col-xs-5 col-sm-5">
+                                                    <label for="weight">Pounds</label>
+                                                    <input id="pounds" type="text"
+                                                           class="form-control form-control-extended "
+                                                           placeholder="Pounds"/>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="height">Height (Cm)</label>
+                                            <input type="text" class="form-control form-control-extended number"
+                                                   data-rule-required="true" id="height"
+                                                   placeholder="Height (Centimeters)"/>
+                                            <div class="row">
+                                                <div class="col-xs-7 col-sm-7">
+                                                    <label for="weight">Feet</label>
+                                                    <input id="feets" type="text"
+                                                           class="form-control form-control-extended "
+                                                           placeholder="Feet"/>
+                                                </div>
+                                                <div class="col-xs-5 col-sm-5">
+                                                    <label for="weight">Inches</label>
+                                                    <input id="inches" type="text"
+                                                           class="form-control form-control-extended "
+                                                           placeholder="Inches"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="pull-left" for="db">Date of Birth (DD/MM/YYYY)</label>
+                                                <input type="text" t-att="{'readonly' : readonly}"
+                                                       data-rule-required="true"
+                                                       class="form-control form-control-extended datepicker" id="db"
+                                                       placeholder="Date of Birth (DD/MM/YYYY)"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row bordered activity">
+                                        <h2 class="text-header">Activity</h2>
+                                        <div class="col-md-4">
+                                            <div id="al" class="form-group ">
+                                                <label class="pull-left" for="al">ACTIVITY LEVEL DURING THE DAY
+                                                </label>
+                                                <select class="form-control form-control-extended " id="actLevel"
+                                                        data-rule-required="true">
+                                                    <option value="-1">Select</option>
+                                                    <option value="1.2">Sedentary</option>
+                                                    <option value="1.375">Lightly Active</option>
+                                                    <option value="1.55">Moderately Active</option>
+                                                    <option value="1.725">Very Active</option>
+                                                    <option value="1.9">Extremely active</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="pull-left" for="bfp">BODY FAT PERCENTAGE</label>
+                                                <input type="text" class="form-control form-control-extended number"
+                                                       id="bfp" placeholder="Body fat Percentage (%)"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="pull-left" for="bp">DO YOU KNOW YOUR MACROS ?</label>
+                                                <label class="checkbox-inline"><input type="checkbox" id="ikmacros"
+                                                                                      value="ikmacros"/>Yes, i know
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row bordered macros">
+                                        <h2 class="text-header">Specify your Daily Macros</h2>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="pull-left">Protein (grams)</label>
+                                                <input type="text" id="protein" data-rule-required="true"
+                                                       class="form-control form-control-extended number protein"
+                                                       placeholder="Protein (grams)"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="pull-left">Fat (grams)</label>
+                                                <input type="text" id="fat" data-rule-required="true"
+                                                       class="form-control form-control-extended number fat"
+                                                       placeholder="Fat (grams)"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="pull-left">Carbs (grams)</label>
+                                                <input type="text" id="carbs" data-rule-required="true"
+                                                       class="form-control form-control-extended number carbs"
+                                                       placeholder="Carbs (grams)"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="pull-left"></label>
+                                                <input type="text" id="totalMacros" t-att="{'disabled': disabled}"
+                                                       class="form-control  form-control-extended total"
+                                                       data-rule-required="true" placeholder="Total"/>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!--Bar button-->
+                                    <div class="barButton">
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="toShowBack(jQuery(this));" role="button">Back
+                                        </a>
+                                        <a class="hvr-underline-from-left hvr-box-shadow-outset pull-right text-btn"
+                                           onclick="validateMacroSlide(jQuery(this));" data-factor-name="macros"
+                                           data-factor-value="macros" data-selection-type="single"
+                                           data-resume-name="Diet Requirements" role="button">Next
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!--How many meals per day or week-->
+                                <div class="slide row-fluid hide" id="step7">
+                                    <div class="row text-center mpd">
+                                        <h3 class="text-header">How many meals per day</h3>
+
+                                        <div class="col-xs-12 col-sm-6 col-md-4">
+                                            <a class="buttonPlan large" data-selection-type="single"
+                                               onclick="btnScheduleClick(jQuery(this));"
+                                               data-factor-name="meals_day"
+                                               data-factor-value="3" href="#" role="button">
+                                                <p class="text-btn">3 Meals</p>
+                                            </a>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-4">
+                                            <a class="buttonPlan large" data-selection-type="single"
+                                               onclick="btnScheduleClick(jQuery(this));"
+                                               data-factor-name="meals_day"
+                                               data-factor-value="4" href="#" role="button">
+                                                <p class="text-btn">4 Meals</p>
+                                            </a>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-4">
+                                            <a class="buttonPlan large" data-selection-type="single"
+                                               onclick="btnScheduleClick(jQuery(this));"
+                                               data-factor-name="meals_day"
+                                               data-factor-value="5" href="#" role="button">
+                                                <p class="text-btn">5 Meals</p>
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                    <br/>
+                                    <!--
+                                    <div class="row mpw">
+                                        <h3 class="text-header">How many meals per week</h3>
+                                        <label class="checkbox-inline text-center checkAll"><input type="checkbox"
+                                                                                                   id="allDay"
+                                                                                                   role="button"
+                                                                                                   value="all"/>All
+                                            Days
+                                        </label>
+
+                                        <div class="row-fluid text-center">
+                                            <a class="buttonAction" data-selection-type="multiple"
+                                               onclick="btnScheduleClick(jQuery(this));"
+                                               data-factor-name="meals_week"
+                                               data-factor-value="0" data-factor-text="Monday" href="#"
+                                               role="button">
+                                                <span>
+                                                    <img src="/bespoke_order/static/src/img/calendar.png"
+                                                         alt="Calendar"/>
+                                                </span>
+                                                <p class="text-btn">Monday</p>
+                                            </a>
+                                            <a class="buttonAction" data-selection-type="multiple"
+                                               onclick="btnScheduleClick(jQuery(this));"
+                                               data-factor-name="meals_week"
+                                               data-factor-value="1" data-factor-text="Tuesday" href="#"
+                                               role="button">
+                                                <span>
+                                                    <img src="/bespoke_order/static/src/img/calendar.png"
+                                                         alt="Calendar"/>
+                                                </span>
+                                                <p class="text-btn">Tuesday</p>
+                                            </a>
+                                            <a class="buttonAction" data-selection-type="multiple"
+                                               onclick="btnScheduleClick(jQuery(this));"
+                                               data-factor-name="meals_week"
+                                               data-factor-value="2" data-factor-text="Wednesday" href="#"
+                                               role="button">
+                                                <span>
+                                                    <img src="/bespoke_order/static/src/img/calendar.png"
+                                                         alt="Calendar"/>
+                                                </span>
+                                                <p class="text-btn">Wednesday</p>
+                                            </a>
+                                            <a class="buttonAction" data-selection-type="multiple"
+                                               onclick="btnScheduleClick(jQuery(this));"
+                                               data-factor-name="meals_week"
+                                               data-factor-value="3" data-factor-text="Thursday" href="#"
+                                               role="button">
+                                                <span>
+                                                    <img src="/bespoke_order/static/src/img/calendar.png"
+                                                         alt="Calendar"/>
+                                                </span>
+                                                <p class="text-btn">Thursday</p>
+                                            </a>
+                                            <a class="buttonAction" data-selection-type="multiple"
+                                               onclick="btnScheduleClick(jQuery(this));"
+                                               data-factor-name="meals_week"
+                                               data-factor-value="4" data-factor-text="Friday" href="#"
+                                               role="button">
+                                                <span>
+                                                    <img src="/bespoke_order/static/src/img/calendar.png"
+                                                         alt="Calendar"/>
+                                                </span>
+                                                <p class="text-btn">Friday</p>
+                                            </a>
+                                        </div>
+
+                                    </div>-->
+
+                                    <!--Bar button-->
+                                    <div class="barButton">
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="toShowBack(jQuery(this));" role="button">Back
+                                        </a>
+                                        <a class="hvr-underline-from-left hvr-box-shadow-outset pull-right text-btn"
+                                           onclick="validateScheduleSlide(jQuery(this));"
+                                           data-factor-name="schedule"
+                                           data-factor-value="schedule" data-selection-type="single"
+                                           data-resume-name="Diet Schedule" role="button">Next
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!--Extras & Exclusions -->
+                                <div class="slide row-fluid hide" id="step8">
+
+                                    <div class="row">
+                                        <h2 class="text-header">Pick up your extras</h2>
+                                        <div class="row-fluid text-center containerExtras">
+
+
+                                        </div>
+                                        <h2 class="text-header">Select your exclusions</h2>
+                                        <div class="container containerExclusions">
+                                            <div id="pickList"></div>
+                                        </div>
+                                    </div>
+                                    <div class="notificationChargesExclusions">
+
+                                    </div>
+
+                                    <!--Bar button-->
+                                    <div class="barButton">
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="toShowBack(jQuery(this));" role="button">Back
+                                        </a>
+                                        <a class="hvr-underline-from-left hvr-box-shadow-outset pull-right text-btn"
+                                           onclick="toShowNext(jQuery(this));addBtnContinueToResume(jQuery(this));"
+                                           data-factor-name="extra_exclusion" data-selection-type="single"
+                                           data-factor-value="extra_exclusion"
+                                           data-resume-name="Extras and Exclusions"
+                                           role="button">Next
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!--Extras & Exclusions -->
+                                <div class="slide row-fluid hide" id="step9">
+                                    <div class="row">
+
+                                        <div class="loader-container" id="summaryLoader">
+                                            <div class="loader">Loading...</div>
+                                            <h4 style="margin-top: 10px;">Preparing your order...</h4>
+                                        </div>
+                                        <div class="col-md-12 summaryOrder ">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h5 class="text-center">
+                                                        <strong>Order summary</strong>
+                                                    </h5>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-condensed table-hover">
+                                                            <caption class="invoice-caption">Selections</caption>
+                                                            <thead>
+                                                                <tr>
+                                                                    <td>
+                                                                        <strong>Your Goal</strong>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <strong>Meal Type</strong>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <strong>Juice Cleanse</strong>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <strong>Post Code</strong>
+                                                                    </td>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td id="goal_plan">example plan</td>
+                                                                    <td class="text-center" id="meal_type">Meal Type
+                                                                    </td>
+                                                                    <td class="text-center" id="juice_cleanse">Juice
+                                                                        Cleanse
+                                                                    </td>
+                                                                    <td class="text-right" id="post_code">Post
+                                                                        Code
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="table-responsive">
+                                                        <table class="table table-condensed your-macros table-hover">
+                                                            <caption class="invoice-caption">Your Macros</caption>
+                                                            <thead>
+                                                                <tr>
+                                                                    <td>
+                                                                        <strong>Goal Calories</strong>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <strong>Tdee</strong>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <strong>BMR</strong>
+                                                                    </td>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="table-responsive">
+                                                        <table class="table table-condensed recomended-products table-hover">
+                                                            <caption class="invoice-caption">Recomended Products
+                                                            </caption>
+                                                            <thead>
+                                                                <tr>
+                                                                    <td class="text-left">
+                                                                        <strong>Item Name</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>Meals/Day</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>Meals/Week</strong>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <strong>Item Price</strong>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <strong>Item Quantity</strong>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <strong>Total</strong>
+                                                                    </td>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="table-responsive">
+                                                        <table class="table table-condensed extra-products table-hover">
+                                                            <caption class="invoice-caption">Extras</caption>
+                                                            <thead>
+                                                                <tr>
+                                                                    <td class="text-left">
+                                                                        <strong>Item</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>Quantity</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>Meals/Day</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>Meals/Week</strong>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <strong>Price</strong>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <strong>Total</strong>
+                                                                    </td>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="table-responsive">
+                                                        <table class="table table-condensed exclusions-products table-hover">
+                                                            <caption
+                                                                    style="font-weight: 600;color: #f39631;padding-bottom: 10px;"
+                                                                    class="invoice-caption">Exclusions
+                                                            </caption>
+                                                            <thead>
+                                                                <tr>
+                                                                    <td class="text-left">
+                                                                        <strong>Item</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>Quantity</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>Meals/Day</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>Meals/Week</strong>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <strong>Charge</strong>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <strong>Total</strong>
+                                                                    </td>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="row">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--Bar button-->
+                                    <div class="barButton">
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="toShowBack(jQuery(this));" role="button">Back
+                                        </a>
+                                        <a class="hvr-underline-from-right hvr-box-shadow-outset pull-left text-btn"
+                                           onclick="PrintOrder();" role="button">
+                                            <i class="fa  fa-print"></i>
+                                            Print
+                                        </a>
+                                        <a class="hvr-underline-from-left hvr-box-shadow-outset pull-right text-btn"
+                                           onclick="addToCart();" data-factor-name="checkout"
+                                           data-factor-value="checkout" data-resume-name="Checkout" role="button">
+                                            Add To
+                                            Cart
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!--Summary-->
+                            <div class="col-md-4 col-lg-4 hidden-sm hidden-xs">
+                                <div class="summary row ">
+                                    <div class="row ">
+                                        <h2 class="text-header">Summary</h2>
+                                        <div class="row-fluid containerSummary ">
+                                            <!--<a class="btnSummary"   href="#" role="button" >
+                                                <p class="text-btn"> Loose some weight</p>
+                                            </a>-->
+                                        </div>
+                                    </div>
+                                </div>
+                                <b>Need help?</b>
+                                <br/>
+                                <p>Email us:
+                                    <a href="mailto:example@example.uk">example@example.uk</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="ecommerce_total_bespoke_pay_exclusions" inherit_id="website_sale.total">
+            <xpath expr="//div[@id='cart_total']/div[@id='order_total_taxes']" position="after">
+                <div class="row" id="order_pay_exclusions">
+                    <span class="col-xs-6 text-right text-muted"
+                          title="Pay for exclusions may be updated after providing shipping address">Exclusions:
+                    </span>
+                    <span class="col-xs-6 text-left text-muted">
+                        <span t-field="website_sale_order.pay_exclusions" style="white-space: nowrap;" t-field-options='{
+                          "widget": "monetary",
+                          "from_currency": "website_sale_order.pricelist_id.currency_id",
+                          "display_currency": "website.currency_id"
+                      }'/>
+                    </span>
+                </div>
+            </xpath>
+        </template>
+
+        <template id="ecommerce_cart_bespoke" inherit_id="website_sale.cart">
+            <xpath expr="//div[@id='wrap']/div[@class='container oe_website_sale']/div[@class='row']/div[@id='right_column']"
+                   position="inside">
+                <a t-if="website_sale_order and website_sale_order.website_order_line"
+                   class="btn btn-primary pull-banner mb32" onclick="readOrderFromCookie();">
+                    <span class="hidden-xs">Edit Order</span>
+                </a>
+            </xpath>
+        </template>
+
+
+    </data>
+</openerp>
+
+
+
